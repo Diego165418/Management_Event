@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Event</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'main.css' %}">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Create a New Event</h1>
+        <form action="{% url 'create_event_page' %}" method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="name" class="form-label">Event Name:</label>
+                <input type="text" id="name" name="name" class="form-control" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label>
+                <textarea id="description" name="description" class="form-control" rows="4"></textarea>
+            </div>
+            
+            <div class="mb-3">
+                <label for="location" class="form-label">Location:</label>
+                <input type="text" id="location" name="location" class="form-control">
+            </div>
+            
+            <div class="mb-3">
+                <label for="start_date" class="form-label">Start Date and Time:</label>
+                <input type="datetime-local" id="start_date" name="start_date" class="form-control" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="end_date" class="form-label">End Date and Time:</label>
+                <input type="datetime-local" id="end_date" name="end_date" class="form-control" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="organizer" class="form-label">Organizer:</label>
+                <select id="organizer" name="organizer" class="form-select">
+                    <option value="">Select an Organizer</option>
+                    {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="max_participants" class="form-label">Max Participants:</label>
+                <input type="number" id="max_participants" name="max_participants" class="form-control">
+            </div>
+            
+            <div class="form-check mb-3">
+                <input type="checkbox" id="is_public" name="is_public" class="form-check-input" checked>
+                <label for="is_public" class="form-check-label">Public Event</label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Create Event</button>
+        </form>
+    </div>
+</body>
+</html>
