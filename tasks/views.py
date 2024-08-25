@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import User, UserRole, Event
 from django.utils import timezone
@@ -99,3 +99,10 @@ def view_home(request):#Renderiza la pagina de home
     events = Event.objects.all()  # Obteniendo eventos de la base
     return render(request, 'home.html', {'events': events})
 
+
+def delete_event(request, event_id): #Func pa eliminar eventos basandose en id
+    if request.method == 'POST':
+        event = get_object_or_404(Event, id=event_id)
+        event.delete()
+        return redirect('home')  # Redirige a la página de inicio o a otra página deseada
+    return redirect('home')
