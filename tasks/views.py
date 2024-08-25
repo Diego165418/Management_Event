@@ -8,7 +8,7 @@ def success_page(request):#Renderiza succes page
 
 
 def create_user(request):
-    roles = UserRole.objects.all()
+    roles = UserRole.objects.all() 
     if request.method == 'POST':
         # Capturar los datos del formulario
         username = request.POST.get('username')
