@@ -9,4 +9,4 @@ urlpatterns = [
     path('delete_event/<int:event_id>/', delete_event, name="delete_event"),
     path('login/', user_login, name="login_page")
     
-] 
+]

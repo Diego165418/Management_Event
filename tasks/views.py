@@ -32,13 +32,34 @@ def user_login(request):
     else:
         form = AuthenticationForm()
 
-    # Pasa los mensajes al contexto en formato JSON
-    messages_list = [{'level': message.level_tag, 'message': message.message} for message in messages.get_messages(request)]
     context = {
         'form': form,
-        'messages': json.dumps(messages_list)  # Convierte los mensajes a JSON
+        'messages': json.dumps([msg.message for msg in messages.get_messages(request)]),  # Convertir los mensajes a JSON
     }
     return render(request, 'login.html', context)
+# def user_login(request):
+#     if request.method == 'POST':
+#         form = AuthenticationForm(request, data=request.POST)
+#         if form.is_valid():
+#             username = form.cleaned_data.get('username')
+#             password = form.cleaned_data.get('password')
+#             user = authenticate(request, username=username, password=password)
+#             if user is not None:
+#                 login(request, user)
+#                 messages.success(request, 'Login successful!')
+#                 return redirect('home')  # Redirige a la página de inicio después del login exitoso
+#             else:
+#                 messages.error(request, 'Invalid username or password.')
+#         else:
+#             messages.error(request, 'Invalid username or password.')
+#     else:
+#         form = AuthenticationForm()
+
+#     context = {
+#         'form': form,
+#         'messages': messages.get_messages(request)  # Pasa los mensajes directamente
+#     }
+#     return render(request, 'login.html', context)
 
 def create_event(request):#Renderiza pagina de creacion de eventos
     if request.method == 'POST':
