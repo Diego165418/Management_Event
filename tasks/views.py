@@ -1,10 +1,37 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.db import IntegrityError
+
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login
+
+
 from .models import User, UserRole, Event
-from django.utils import timezone
+from django.contrib.auth import authenticate, login
 
 
 # Create your views here.
+def login(request):#Renderiza LOgin
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'Welcome back, {user.username}!')
+                return redirect('home')  # Redirige a la página de inicio después del login exitoso
+            else:
+                messages.error(request, 'Invalid username or password.')
+        else:
+            messages.error(request, 'Invalid username or password.')
+    else:
+        form = AuthenticationForm()
+
+    return render(request, 'login.html', {'form': form})
+
 def create_event(request):#Renderiza pagina de creacion de eventos
     if request.method == 'POST':
         # Obtén los datos del formulario del request
@@ -15,7 +42,7 @@ def create_event(request):#Renderiza pagina de creacion de eventos
         end_date = request.POST.get('end_date')
         organizer_id = request.POST.get('organizer')
         max_participants = request.POST.get('max_participants')
-        is_public = 'is_public' in request.POST  # Obtén el valor del checkbox (True si está marcado)
+        is_public = 'is_public' in request.POST 
 
         # Realiza validaciones adicionales si es necesario
         if not name or not start_date or not end_date:
@@ -54,7 +81,7 @@ def success_page(request):#Renderiza pagina succes
 
 
 def create_user(request):
-    roles = UserRole.objects.all() #Obtener roles de la base
+    roles = UserRole.objects.all()  # Obtener roles de la base
     if request.method == 'POST':
         # Capturar los datos del formulario
         username = request.POST.get('username')
@@ -68,29 +95,37 @@ def create_user(request):
             messages.error(request, "Please fill out all required fields.")
         else:
             try:
-                # Tomando rol del formulario(organizador, asistente y espectador)
-                role = UserRole.objects.get(id=role_id) if role_id else None
+                # Verificar si ya existe un usuario con el email o el username proporcionado
+                if User.objects.filter(email=email).exists():
+                    messages.error(request, "Error: Ya existe un usuario con este correo electrónico.")
+                elif User.objects.filter(username=username).exists():
+                    messages.error(request, "Error: Ya existe un usuario con este nombre de usuario.")
+                else:
+                    # Tomando rol del formulario (organizador, asistente y espectador)
+                    role = UserRole.objects.get(id=role_id) if role_id else None
 
-                # Crear un nuevo usuario
-                user = User(
-                    username=username,
-                    email=email,
-                    password=password,  # HAY QUE HASHEAR, no se comoxd
-                    role=role,
-                    is_active=is_active
-                )
-                
-                # Guardar el usuario en la base de datos
-                user.save()
+                    # Crear un nuevo usuario con contraseña hasheada
+                    user = User(
+                        username=username,
+                        email=email,
+                        password=make_password(password),  # Hashear la contraseña
+                        role=role,
+                        is_active=is_active
+                    )
+                    
+                    # Guardar el usuario en la base de datos
+                    user.save()
 
-                messages.success(request, "User created successfully!")
+                    messages.success(request, "User created successfully!")
 
-                # Redirigir a una página de éxito o a la misma página
-                return redirect('success_page')
+                    # Redirigir a una página de éxito o a la misma página
+                    return redirect('success_page')
             except UserRole.DoesNotExist:
                 messages.error(request, "Selected role does not exist.")
-            except Exception as e:
+            except IntegrityError as e:
                 messages.error(request, f"An error occurred: {str(e)}")
+            except Exception as e:
+                messages.error(request, f"An unexpected error occurred: {str(e)}")
 
     # Renderizar la página con el formulario y los roles
     return render(request, 'user.html', {'roles': roles})
