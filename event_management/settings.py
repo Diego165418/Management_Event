@@ -18,6 +18,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+# Configuración del modelo de usuario
+AUTH_USER_MODEL = 'tasks.User'
+
+# Configuración de autenticación
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-!zyoa^=m7=$n8armfm-&l!$67q2!n9#zf2qt2%mx*_)26h5hp3'
