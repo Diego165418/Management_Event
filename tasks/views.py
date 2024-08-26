@@ -1,18 +1,20 @@
+import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db import IntegrityError
 
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import login
+from django.contrib.auth import login,login as auth_login
 
 
 from .models import User, UserRole, Event
 from django.contrib.auth import authenticate, login
 
 
+
 # Create your views here.
-def login(request):#Renderiza LOgin
+def user_login(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -21,7 +23,7 @@ def login(request):#Renderiza LOgin
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                messages.success(request, f'Welcome back, {user.username}!')
+                messages.success(request, 'Login successful!')
                 return redirect('home')  # Redirige a la página de inicio después del login exitoso
             else:
                 messages.error(request, 'Invalid username or password.')
@@ -30,7 +32,13 @@ def login(request):#Renderiza LOgin
     else:
         form = AuthenticationForm()
 
-    return render(request, 'login.html', {'form': form})
+    # Pasa los mensajes al contexto en formato JSON
+    messages_list = [{'level': message.level_tag, 'message': message.message} for message in messages.get_messages(request)]
+    context = {
+        'form': form,
+        'messages': json.dumps(messages_list)  # Convierte los mensajes a JSON
+    }
+    return render(request, 'login.html', context)
 
 def create_event(request):#Renderiza pagina de creacion de eventos
     if request.method == 'POST':
@@ -82,53 +90,46 @@ def success_page(request):#Renderiza pagina succes
 
 def create_user(request):
     roles = UserRole.objects.all()  # Obtener roles de la base
+    messages = []
+    
     if request.method == 'POST':
-        # Capturar los datos del formulario
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
         role_id = request.POST.get('role')
-        is_active = request.POST.get('is_active') == 'on'  
+        is_active = request.POST.get('is_active') == 'on'
 
-        # Validar los datos antes de crear el usuario
         if not username or not email or not password:
-            messages.error(request, "Please fill out all required fields.")
+            messages.append("Please fill out all required fields.")
         else:
             try:
-                # Verificar si ya existe un usuario con el email o el username proporcionado
                 if User.objects.filter(email=email).exists():
-                    messages.error(request, "Error: Ya existe un usuario con este correo electrónico.")
+                    messages.append("Error: Ya existe un usuario con este correo electrónico.")
                 elif User.objects.filter(username=username).exists():
-                    messages.error(request, "Error: Ya existe un usuario con este nombre de usuario.")
+                    messages.append("Error: Ya existe un usuario con este nombre de usuario.")
                 else:
-                    # Tomando rol del formulario (organizador, asistente y espectador)
                     role = UserRole.objects.get(id=role_id) if role_id else None
-
-                    # Crear un nuevo usuario con contraseña hasheada
                     user = User(
                         username=username,
                         email=email,
-                        password=make_password(password),  # Hashear la contraseña
+                        password=make_password(password),
                         role=role,
                         is_active=is_active
                     )
-                    
-                    # Guardar el usuario en la base de datos
                     user.save()
-
-                    messages.success(request, "User created successfully!")
-
-                    # Redirigir a una página de éxito o a la misma página
+                    messages.append("User created successfully!")
                     return redirect('success_page')
             except UserRole.DoesNotExist:
-                messages.error(request, "Selected role does not exist.")
+                messages.append("Selected role does not exist.")
             except IntegrityError as e:
-                messages.error(request, f"An error occurred: {str(e)}")
+                messages.append(f"An error occurred: {str(e)}")
             except Exception as e:
-                messages.error(request, f"An unexpected error occurred: {str(e)}")
+                messages.append(f"An unexpected error occurred: {str(e)}")
 
-    # Renderizar la página con el formulario y los roles
-    return render(request, 'user.html', {'roles': roles})
+    return render(request, 'user.html', {
+        'roles': roles,
+        'messages': json.dumps(messages)  # Pasar mensajes como JSON
+    })
 
 def view_home(request):#Renderiza la pagina de home
     events = Event.objects.all()  # Obteniendo eventos de la base
