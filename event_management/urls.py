@@ -17,9 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from tasks.views import view_home
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', view_home, name='home'), 
     path('', include('tasks.urls'))
-]
+]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
