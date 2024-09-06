@@ -45,3 +45,29 @@ document.addEventListener('DOMContentLoaded', function () {
         messageModal.show();
     }
 });
+// document.addEventListener('DOMContentLoaded', function () {
+//     // Obtiene los mensajes desde el script de datos
+//     var messagesData = document.getElementById('messages-data').textContent;
+    
+//     // Intenta analizar los mensajes JSON
+//     var messages = [];
+//     try {
+//         messages = JSON.parse(messagesData || '[]');
+//     } catch (e) {
+//         console.error('Error parsing messages:', e);
+//     }
+
+//     // Filtra mensajes de error o advertencia
+//     var errorMessages = messages.filter(msg => msg.level === 'error' || msg.level === 'warning');
+    
+//     // Verifica si hay mensajes de error o advertencia para mostrar
+//     if (errorMessages.length > 0) {
+//         var modalMessage = document.getElementById('modalMessage');
+//         modalMessage.innerHTML = errorMessages.map(msg => `
+//             <div class="alert alert-info">${msg}</div>
+//         `).join('');
+        
+//         var messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
+//         messageModal.show();
+//     }
+// });

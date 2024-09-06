@@ -1,4 +1,13 @@
 {% load static %}
+{% if form.errors %}
+    <ul>
+    {% for field in form %}
+        {% for error in field.errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+    {% endfor %}
+    </ul>
+{% endif %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -140,7 +149,7 @@
             </form>
         </div>
 
-        <!-- Scripts necesarios para Bootstrap y el archivo de mensajes -->
+        <!-- Scripts necesarios para Bootstrap y mensajes -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <script src="{% static 'js/messages.js' %}"></script>
     </body>

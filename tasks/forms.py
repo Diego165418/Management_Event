@@ -1,9 +1,9 @@
-#MDOELO DE FORMULARIO PERSONALIZADO
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import User, UserRole
 
 class CustomUserCreationForm(UserCreationForm):
+    usable_password = None
     email = forms.EmailField(required=True)
     first_name = forms.CharField(max_length=30, required=True)
     last_name = forms.CharField(max_length=30, required=True)
@@ -20,12 +20,9 @@ class CustomUserCreationForm(UserCreationForm):
         user.last_name = self.cleaned_data['last_name']
         user.role = self.cleaned_data['role']
 
-        # Establecer la contraseña usando set_password para asegurarla
+        # Usa set_password para almacenar la contraseña de manera segura
         user.set_password(self.cleaned_data['password1'])
         
         if commit:
             user.save()
         return user
-
-
-#MDOELO DE FORMULARIO PERSONALIZADO FIN
