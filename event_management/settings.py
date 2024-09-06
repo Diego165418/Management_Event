@@ -26,8 +26,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 AUTH_USER_MODEL = 'tasks.User'
 
 # Configuración de autenticación
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+# LOGIN_REDIRECT_URL = '/'
+# LOGOUT_REDIRECT_URL = '/'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-!zyoa^=m7=$n8armfm-&l!$67q2!n9#zf2qt2%mx*_)26h5hp3'
@@ -130,9 +130,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-# STATIC_URL = 'static/'
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]  
+STATIC_URL = 'static/'
+# STATIC_URL = '/static/'
+# STATICFILES_DIRS = [BASE_DIR / "static"]  
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
